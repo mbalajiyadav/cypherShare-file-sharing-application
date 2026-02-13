@@ -629,3 +629,65 @@ footer {
 }
 
 
+/* Extra small devices: 360px or less */
+@media (max-width: 360px) {
+
+  /* Container */
+  .container {
+    padding: 20px 12px;
+  }
+
+  /* Form elements full width */
+  input[type="file"],
+  input[type="password"],
+  button {
+    width: 100%;
+    font-size: 14px;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+
+  /* Share buttons stack nicely */
+  .share-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .whatsapp-btn,
+  .email-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  /* QR Image smaller */
+  .qr-image {
+    width: 120px;
+    height: 120px;
+  }
+
+  /* Footer links */
+  .footer-links {
+    flex-direction: column;
+    gap: 6px;
+    font-size: 12px;
+  }
+
+  /* Heading smaller */
+  .header h1 {
+    font-size: 20px;
+  }
+
+  .header p {
+    font-size: 12px;
+  }
+
+  /* Reduce top margin on buttons */
+  .btn {
+    margin-top: 12px;
+    padding: 10px;
+  }
+}
+
+
