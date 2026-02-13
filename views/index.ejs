@@ -1,24 +1,245 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CipherShare</title>
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <% if (locals.fileLink != null) { %>
-    <div style="margin-bottom: 1rem;">
-      Your file is upload
-      <a href="<%= locals.fileLink %>"><%= locals.fileLink %></a>
+
+  <!-- HEADER -->
+  <header class="header">
+  <div class="header-left">
+    <h1>CipherShare</h1>
+    <p>Upload and share files securely with password protection</p>
+  </div>
+
+  <div class="header-right">
+    <a href="/download" class="nav-btn">
+      <i class="fa-solid fa-download"></i>
+      Download
+    </a>
+
+    <button id="theme-toggle" aria-label="Toggle theme">🌙</button>
+  </div>
+</header>
+
+
+
+  <!-- RESULT AFTER UPLOAD -->
+  <% if (fileLink) { %>
+
+<div class="upload-success">✅ File uploaded successfully!</div>
+
+<div class="result-container">
+
+  <!-- TOP ROW: QR + ACCESS CODE -->
+  <div class="result-top-row">
+
+    <!-- QR CARD -->
+    <div class="card-square">
+      <img src="<%= qrCodePath %>" alt="QR Code" class="qr-image" />
+      <a href="<%= qrCodePath %>" download class="qr-download-btn">
+        Download QR Code
+      </a>
     </div>
-  <% } %>
-  <form action="/upload" method="post" style="display: grid; gap: .5rem; grid-template-columns: auto 1fr; max-width: 500px; margin: 0 auto;" enctype="multipart/form-data">
-    <label for="file">File:</label>
-    <input type="file" id="file" name="file" required />
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" />
-    <button style="grid-column: span 2;" type="submit">Share</button>
-  </form>
+
+    <!-- ACCESS CODE CARD -->
+    <div class="card-square access-code-square">
+      <p>🔐 Secret Access Code</p>
+
+      <input
+        type="text"
+        id="accessCodeInput"
+        value="<%= accessCode %>"
+        readonly
+      />
+
+      <button id="copyCodeBtn" onclick="copyAccessCode()">Copy</button>
+
+      <small>Use this code to download without the link</small>
+    </div>
+
+  </div>
+
+  <!-- LINK + SHARE -->
+  <div class="link-section">
+
+    <div class="copy-box">
+      <span class="link-icon">🔗</span>
+      <input
+        type="text"
+        id="fileLinkInput"
+        value="<%= fileLink %>"
+        readonly
+      />
+      <button id="copyBtn" onclick="copyLink()">COPY</button>
+    </div>
+
+    <div class="share-buttons">
+      <a id="whatsappShare" class="whatsapp-btn" target="_blank">
+        <i class="fa-brands fa-whatsapp"></i>
+        Share on WhatsApp
+      </a>
+
+      <a id="emailShare" class="email-btn">
+        <i class="fa-solid fa-envelope"></i>
+        Send via Email
+      </a>
+    </div>
+
+  </div>
+
+</div>
+
+<% } %>
+
+
+  <!-- UPLOAD FORM -->
+  <main class="container">
+    <form
+      action="/upload"
+      method="post"
+      enctype="multipart/form-data"
+      id="uploadForm"
+      style="display:grid;gap:0.5rem;grid-template-columns:auto 1fr;max-width:500px;margin:auto;"
+    >
+      <label for="file">File</label>
+      <input type="file" id="file" name="file" required />
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" />
+
+      <button type="submit" style="grid-column: span 2;">Share</button>
+
+      <div id="upload-status" class="upload-status hidden">
+        <div class="spinner"></div>
+        <!-- <span>Uploading...</span> -->
+      </div>
+    </form>
+  </main>
+
+  <!-- FOOTER -->
+<footer class="footer">
+  <p>Designed and developed by <strong>Balaji</strong> with ❤️ </p>
+
+  <div class="footer-links">
+
+    <a href="https://github.com/mbalajiyadav" target="_blank" aria-label="GitHub">
+      <i class="fa-brands fa-github"></i>
+    </a>
+
+    <a href="mailto:yourmail@gmail.com" aria-label="Email">
+      <i class="fa-solid fa-envelope"></i>
+    </a>
+
+    <a href="https://www.linkedin.com/in/balaji-mediboyina-b9823a251/" target="_blank" aria-label="LinkedIn">
+      <i class="fa-brands fa-linkedin"></i>
+    </a>
+    <a href="/privacy">Privacy Policy</a>
+    <a href="/terms">Terms of Service</a>
+
+  </div>
+  <p style="font-size: 12px; margin-top: 5px;">© 2026 File Sharing System. All Rights Reserved.
+Powered by Node.js, Express & MongoDB.
+</p>
+</footer>
+
+
+  <!-- THEME TOGGLE -->
+  <script>
+    const toggleBtn = document.getElementById("theme-toggle");
+    const savedTheme = localStorage.getItem("theme");
+
+    if (savedTheme === "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+      toggleBtn.textContent = "☀️";
+    }
+
+    toggleBtn.addEventListener("click", () => {
+      const isDark =
+        document.documentElement.getAttribute("data-theme") === "dark";
+
+      if (isDark) {
+        document.documentElement.removeAttribute("data-theme");
+        localStorage.setItem("theme", "light");
+        toggleBtn.textContent = "🌙";
+      } else {
+        document.documentElement.setAttribute("data-theme", "dark");
+        localStorage.setItem("theme", "dark");
+        toggleBtn.textContent = "☀️";
+      }
+    });
+  </script>
+
+  <!-- UPLOAD SPINNER -->
+  <script>
+    const form = document.getElementById("uploadForm");
+    const status = document.getElementById("upload-status");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      status.classList.remove("hidden");
+      setTimeout(() => form.submit(), 1000);
+    });
+  </script>
+
+  <!-- COPY FUNCTIONS -->
+  <script>
+    function copyLink() {
+      const input = document.getElementById("fileLinkInput");
+      const btn = document.getElementById("copyBtn");
+      navigator.clipboard.writeText(input.value);
+      btn.textContent = "COPIED";
+      setTimeout(() => btn.textContent = "COPY", 1500);
+    }
+
+    function copyAccessCode() {
+      const input = document.getElementById("accessCodeInput");
+      const btn = document.getElementById("copyCodeBtn");
+      navigator.clipboard.writeText(input.value);
+      btn.textContent = "COPIED";
+      setTimeout(() => btn.textContent = "Copy", 1500);
+    }
+  </script>
+
+  <!-- SHARE LOGIC -->
+  <script>
+    const fileLink = "<%= fileLink || '' %>";
+
+    if (fileLink) {
+      document.getElementById("whatsappShare").href =
+        `https://wa.me/?text=${encodeURIComponent(
+          "Download your file using this link:\n" + fileLink
+        )}`;
+
+      document.getElementById("emailShare").addEventListener("click", function (e) {
+        e.preventDefault();
+
+        const subject = encodeURIComponent("File shared via CipherShare");
+        const body = encodeURIComponent(
+          "Hi,\n\nYou can download the file using the link below:\n\n" +
+          fileLink +
+          "\n\nPassword will be shared securely.\n\n— CipherShare"
+        );
+
+        window.open(
+          `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`,
+          "_blank"
+        );
+      });
+    }
+  </script>
+
 </body>
 </html>

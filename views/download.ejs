@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Download File – CipherShare</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header class="header">
+  <h1>CipherShare</h1>
+  <a href="/" class="nav-btn">⬅ Back</a>
+</header>
+
+<main class="container">
+
+  <div class="download-card">
+    <h2>🔐 Enter Access Code</h2>
+
+    <form onsubmit="event.preventDefault(); window.location='/file/' + this.accessCode.value;">
+      <input
+        type="text"
+        name="accessCode"
+        placeholder="8-digit access code"
+        required
+      />
+
+      <button type="submit">
+        <i class="fa-solid fa-download"></i>
+        Download File
+      </button>
+    </form>
+
+    <% if (error) { %>
+      <p class="error"><%= error %></p>
+    <% } %>
+  </div>
+
+</main>
+
+</body>
+</html>

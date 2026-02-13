@@ -1,0 +1,631 @@
+/* =========================
+   THEME VARIABLES
+========================= */
+
+/* Light Theme */
+:root {
+  --bg-color: #f8fafc;
+  --text-color: #0f172a;
+  --card-bg: #ffffff;
+  --primary-color: #2563eb;
+  --primary-hover: #1e40af;
+  --secondary-color: #1e293b;
+  --border-color: #e5e7eb;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  --bg-color: #0f172a;
+  --text-color: #f8fafc;
+  --card-bg: #1e293b;
+  --primary-color: #60a5fa;
+  --primary-hover: #3b82f6;
+  --secondary-color: #020617;
+  --border-color: #334155;
+}
+
+/* =========================
+   RESET
+========================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
+   display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+main {
+  flex: 1; /* makes the content grow and push footer down */
+}
+
+/* =========================
+   HEADER
+========================= */
+/* HEADER CONTAINER */
+.header {
+  background: linear-gradient(135deg, var(--primary-color), #1e3c72);
+  padding: 1.2rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* LEFT SECTION (Title + subtitle) */
+.header-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.header h1 {
+  font-size: 28px;
+  color: white;
+  margin: 0;
+}
+
+.header p {
+  font-size: 14px;
+  color: #e0e7ff;
+  margin: 4px 0 0;
+}
+
+/* RIGHT SECTION (Download + Theme toggle) */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 30px; /* ⭐ prevents overlap */
+
+}
+
+/* DOWNLOAD BUTTON */
+.nav-btn {
+  background: #2563eb;
+  color: white;
+  padding: 0.45rem 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: background 0.3s;
+  white-space: nowrap;
+}
+
+.nav-btn:hover {
+  background: #1e40af;
+}
+
+/* THEME TOGGLE */
+#theme-toggle {
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: white;
+}
+
+/* MOBILE RESPONSIVE */
+@media (max-width: 640px) {
+  .header {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .header-right {
+    justify-content: center;
+  }
+}
+
+
+
+/* =========================
+   THEME TOGGLE
+========================= */
+ #theme-toggle {
+   /* position: absolute;  */
+   top: 16px;
+  right: 16px;
+  background: transparent;
+  border: 2px solid white;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+} 
+#theme-toggle {
+  transition: transform 0.3s ease, color 0.3s ease;
+  cursor: pointer;
+}
+
+#theme-toggle:hover {
+  color: #38bdf8;
+  transform: translateY(-3px);
+}
+
+/* =========================
+   CONTAINER
+========================= */
+.container {
+  display: flex;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+/* =========================
+   FORM
+========================= */
+form {
+  background: var(--card-bg);
+  padding: 32px;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 16px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+input[type="file"],
+input[type="password"] {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-color);
+}
+
+button {
+  padding: 14px;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.hidden {
+  display: none;
+}
+#upload-status {
+  grid-column: span 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* =========================
+   UPLOAD SUCCESS
+========================= */
+.upload-success {
+  margin: 20px auto;
+  padding: 12px;
+  max-width: 720px;
+  background: #dcfce7;
+  color: #166534;
+  border-radius: 8px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* =========================
+   RESULT LAYOUT
+========================= */
+.result-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 30px;
+}
+
+/* TOP ROW */
+.result-top-row {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+/* COMMON SQUARE CARD */
+.card-square {
+  width: 260px;
+  min-height: 260px;
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 1.2rem;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* =========================
+   QR SECTION
+========================= */
+.qr-image {
+  width: 180px;
+  height: 180px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  background: white;
+}
+
+.qr-download-btn {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: #16a34a;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* =========================
+   ACCESS CODE
+========================= */
+.access-code-square p {
+  font-weight: 600;
+}
+
+.access-code-square input {
+  width: 100%;
+  margin: 1rem 0;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 3px;
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.access-code-square button {
+  width: 100%;
+  padding: 0.6rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.access-code-square small {
+  display: block;
+  margin-top: 0.6rem;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+/* =========================
+   LINK + SHARE
+========================= */
+.link-section {
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+}
+
+.copy-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 8px;
+}
+
+.copy-box input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text-color);
+}
+
+.copy-box button {
+  background: var(--primary-color);
+  color: white;
+  border-radius: 8px;
+  padding: 8px 14px;
+}
+
+/* SHARE BUTTONS */
+.share-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.whatsapp-btn {
+  background: #25d366;
+  color: white;
+  padding: 12px 22px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.email-btn {
+  background: #1a73e8;
+  color: white;
+  padding: 12px 22px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* =========================
+   FOOTER
+========================= */
+.footer {
+  background: #0f172a;
+  color: #e5e7eb;
+  text-align: center;
+  padding: 1.5rem 1rem;
+  justify-content: space-between;
+  /* margin-bottom: 20px; */
+}
+
+.footer-links {
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  /* margin-bottom: 15px; */
+
+}
+
+.footer-links a {
+  color: #e5e7eb;
+  font-size: 18px;
+  transition: color 0.3s, transform 0.3s;
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  color: #38bdf8;
+  transform: translateY(-3px);
+}
+
+/* CSS FOR DOWNLOAD PAGE */
+/* Reset */
+/* body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f3f4f6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+} */
+
+/* Center Section */
+.page-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Download Card */
+.download-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+/* Heading */
+.download-card h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.4rem;
+  color: #111827;
+}
+
+/* Input */
+.download-card input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 0.95rem;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+.download-card input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+/* Button */
+.download-card button {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.download-card button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+}
+
+/* Error Message */
+.error {
+  color: #dc2626;
+  margin-top: 0.8rem;
+  font-size: 0.9rem;
+}
+
+/* Footer Fix */
+footer {
+  text-align: center;
+  padding: 1rem;
+  background: #0f172a;
+  color: white;
+}
+
+
+
+
+/* =========================
+   MOBILE
+========================= */
+@media (max-width: 768px) {
+  .result-top-row {
+    flex-direction: column;
+  }
+}
+@media (max-width: 768px) {
+
+  /* HEADER */
+  .header {
+    text-align: center;
+    padding: 20px 12px;
+  }
+
+  #theme-toggle {
+    top: 12px;
+    right: 12px;
+    padding: 5px 10px;
+    font-size: 14px;
+  }
+
+  /* CONTAINER */
+  .container {
+    padding: 40px 16px;
+  }
+
+  /* FORM */
+  form {
+    padding: 24px;
+    gap: 14px;
+  }
+
+  input[type="file"],
+  input[type="password"] {
+    font-size: 14px;
+  }
+
+  button {
+    font-size: 15px;
+    padding: 12px;
+  }
+
+  /* RESULT LAYOUT */
+  .result-top-row {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .card-square {
+    width: 100%;
+    min-height: auto;
+  }
+
+  /* QR */
+  .qr-image {
+    width: 160px;
+    height: 160px;
+  }
+
+  /* LINK SECTION */
+  .link-section {
+    max-width: 100%;
+  }
+
+  .copy-box {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .copy-box input {
+    width: 100%;
+    text-align: center;
+  }
+
+  .copy-box button {
+    width: 100%;
+  }
+
+  /* FOOTER */
+  .footer-links {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+}
+@media (max-width: 480px) {
+
+  .header h1 {
+    font-size: 22px;
+  }
+
+  .header p {
+    font-size: 13px;
+  }
+
+  #theme-toggle {
+    padding: 4px 8px;
+    font-size: 13px;
+  }
+
+  form {
+    padding: 20px;
+  }
+
+  .qr-image {
+    width: 140px;
+    height: 140px;
+  }
+
+  .share-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .whatsapp-btn,
+  .email-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+.btn {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 20px;
+}
+
+.btn:hover {
+  background-color: var(--primary-hover);
+}
+
+
