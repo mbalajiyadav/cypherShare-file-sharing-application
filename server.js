@@ -244,8 +244,8 @@ app.get("/terms", (req, res) => {
 /* -------------------- Start Server -------------------- */
 const PORT = process.env.PORT || 3000;
 
-mongoose.connection.once("open", () => {
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-  });
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
+
+
