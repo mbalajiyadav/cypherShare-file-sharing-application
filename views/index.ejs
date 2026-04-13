@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>CipherShare</title>
 
   <!-- Font Awesome -->
@@ -14,6 +15,7 @@
 
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="shortcut icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZmwJF441aHSeKZ5XR-jlgWiOlDUQnHyTMGQ&s" type="image/x-icon">
 </head>
 <body>
 
@@ -91,11 +93,6 @@
         <i class="fa-brands fa-whatsapp"></i>
         Share on WhatsApp
       </a>
-
-      <a id="emailShare" class="email-btn">
-        <i class="fa-solid fa-envelope"></i>
-        Send via Email
-      </a>
     </div>
 
   </div>
@@ -119,6 +116,9 @@
 
       <label for="password">Password</label>
       <input type="password" id="password" name="password" />
+
+      <label for="email">Recipient Email (Optional)</label>
+      <input type="email" id="email" name="email" placeholder="recipient@example.com" />
 
       <button type="submit" style="grid-column: span 2;">Share</button>
 
@@ -222,23 +222,80 @@ Powered by Node.js, Express & MongoDB.
         `https://wa.me/?text=${encodeURIComponent(
           "Download your file using this link:\n" + fileLink
         )}`;
-
-      document.getElementById("emailShare").addEventListener("click", function (e) {
-        e.preventDefault();
-
-        const subject = encodeURIComponent("File shared via CipherShare");
-        const body = encodeURIComponent(
-          "Hi,\n\nYou can download the file using the link below:\n\n" +
-          fileLink +
-          "\n\nPassword will be shared securely.\n\n— CipherShare"
-        );
-
-        window.open(
-          `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`,
-          "_blank"
-        );
-      });
     }
+  </script>
+
+  <!-- EMAIL SUCCESS POPUP -->
+  <div id="emailSuccessPopup" class="email-success-popup">
+    <div class="popup-content">
+      <i class="fa-solid fa-check-circle"></i>
+      <h3>Email Sent Successfully!</h3>
+      <p>The file has been shared via email.</p>
+    </div>
+  </div>
+
+  <style>
+    .email-success-popup {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #28a745, #20c997);
+      color: white;
+      padding: 20px 25px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
+      z-index: 1000;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all 0.3s ease;
+      max-width: 300px;
+    }
+
+    .popup-content {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .popup-content i {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .popup-content h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .popup-content p {
+      margin: 5px 0 0 0;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .email-success-popup.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  </style>
+
+  <script>
+    function showEmailSuccessPopup() {
+      const popup = document.getElementById('emailSuccessPopup');
+      popup.classList.add('show');
+      
+      setTimeout(() => {
+        popup.classList.remove('show');
+      }, 4000);
+    }
+
+    // Show popup if email was sent successfully
+    <% if (typeof emailSent !== 'undefined' && emailSent) { %>
+      document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(showEmailSuccessPopup, 1000);
+      });
+    <% } %>
   </script>
 
 </body>

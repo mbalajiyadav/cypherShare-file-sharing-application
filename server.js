@@ -7,6 +7,7 @@ const bcrypt = require("bcrypt");
 const path = require("path");
 const fs = require("fs");
 const QRCode = require("qrcode");
+const sgMail = require("@sendgrid/mail");
 
 const File = require("./models/File");
 
@@ -35,6 +36,9 @@ mongoose
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Trust proxy for Render and other hosting platforms
+app.set('trust proxy', 1);
+
 app.use(express.static("public"));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
@@ -43,6 +47,134 @@ const upload = multer({ dest: "uploads/" });
 
 /* -------------------- View Engine -------------------- */
 app.set("view engine", "ejs");
+
+/* -------------------- SendGrid Configuration -------------------- */
+if (process.env.SENDGRID_API_KEY) {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+}
+
+/* -------------------- Email Service -------------------- */
+const sendShareEmail = async (recipientEmail, fileName, fileLink, accessCode) => {
+  console.log("=== Email Debug ===");
+  console.log("Recipient:", recipientEmail);
+  console.log("File Name:", fileName);
+  console.log("Has SendGrid API Key:", !!process.env.SENDGRID_API_KEY);
+  console.log("Has SendGrid From Email:", !!process.env.FROM_EMAIL);
+  
+  // Try SendGrid first
+  if (process.env.SENDGRID_API_KEY && process.env.FROM_EMAIL) {
+    console.log("Using SendGrid...");
+    await sendSendGridEmail(recipientEmail, fileName, fileLink, accessCode);
+  }
+  // Fallback to Gmail SMTP
+  else if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
+    console.log("Using Gmail SMTP fallback...");
+    await sendGmailEmail(recipientEmail, fileName, fileLink, accessCode);
+  }
+  else {
+    console.log("No email service configured - skipping email");
+    console.log("Configure either:");
+    console.log("  - SENDGRID_API_KEY + FROM_EMAIL (for SendGrid)");
+    console.log("  - GMAIL_USER + GMAIL_APP_PASSWORD (for Gmail)");
+    return;
+  }
+};
+
+/* -------------------- SendGrid Email Service -------------------- */
+const sendSendGridEmail = async (recipientEmail, fileName, fileLink, accessCode) => {
+  console.log("API Key starts with:", process.env.SENDGRID_API_KEY?.substring(0, 10) + "...");
+
+  const msg = {
+    to: recipientEmail,
+    from: process.env.FROM_EMAIL,
+    subject: `File Shared: ${fileName}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #333;">File Shared via CipherShare</h2>
+        <p>Hi there,</p>
+        <p>A file has been shared with you: <strong>${fileName}</strong></p>
+        
+        <div style="background-color: #f5f5f5; padding: 20px; border-radius: 5px; margin: 20px 0;">
+          <h3 style="margin-top: 0;">Download Options:</h3>
+          <p><strong>Direct Link:</strong></p>
+          <a href="${fileLink}" style="display: inline-block; background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 10px 0;">Download File</a>
+          
+          <p style="margin-top: 20px;"><strong>Access Code:</strong> <code style="background-color: #e9ecef; padding: 5px 10px; border-radius: 3px;">${accessCode}</code></p>
+        </div>
+        
+        <p><small>Note: If the file is password protected, you'll need the password provided by the sender.</small></p>
+        
+        <hr style="margin: 30px 0;">
+        <p style="color: #666; font-size: 12px;">This email was sent via CipherShare - Secure File Sharing System</p>
+      </div>
+    `,
+  };
+
+  try {
+    console.log("Attempting to send email...");
+    console.log("Message object:", {
+      to: msg.to,
+      from: msg.from,
+      subject: msg.subject
+    });
+    
+    const response = await sgMail.send(msg);
+    console.log(`Email sent successfully to ${recipientEmail}`);
+    console.log("SendGrid response:", response);
+  } catch (error) {
+    console.error('=== SendGrid Error Details ===');
+    console.error('Error:', error.message);
+    console.error('Response:', error.response?.body);
+    console.error('Status Code:', error.response?.statusCode);
+    console.error('Full error:', error);
+  }
+};
+
+/* -------------------- Gmail SMTP Fallback -------------------- */
+const sendGmailEmail = async (recipientEmail, fileName, fileLink, accessCode) => {
+  try {
+    const nodemailer = require('nodemailer');
+    
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD
+      }
+    });
+
+    const mailOptions = {
+      from: process.env.GMAIL_USER,
+      to: recipientEmail,
+      subject: `File Shared: ${fileName}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #333;">🔐 File Shared via CipherShare</h2>
+          <p>Hi there,</p>
+          <p>A file has been shared with you: <strong>${fileName}</strong></p>
+          
+          <div style="background-color: #f5f5f5; padding: 20px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="margin-top: 0;">Download Options:</h3>
+            <p><strong>🔗 Direct Link:</strong></p>
+            <a href="${fileLink}" style="display: inline-block; background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 10px 0;">Download File</a>
+            
+            <p style="margin-top: 20px;"><strong>🔑 Access Code:</strong> <code style="background-color: #e9ecef; padding: 5px 10px; border-radius: 3px;">${accessCode}</code></p>
+          </div>
+          
+          <p><small>Note: If the file is password protected, you'll need the password provided by the sender.</small></p>
+          
+          <hr style="margin: 30px 0;">
+          <p style="color: #666; font-size: 12px;">This email was sent via CipherShare - Secure File Sharing System</p>
+        </div>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`Gmail sent successfully to ${recipientEmail}`);
+  } catch (error) {
+    console.error('Gmail Error:', error);
+  }
+};
 
 /* -------------------- Access Code Generator -------------------- */
 const generateAccessCode = async () => {
@@ -71,6 +203,7 @@ app.get("/", (req, res) => {
     fileLink: null,
     qrCodePath: null,
     accessCode: null,
+    emailSent: false,
   });
 });
 
@@ -98,16 +231,35 @@ app.post("/upload", upload.single("file"), async (req, res) => {
 
     const baseUrl =
       process.env.BASE_URL ||
-      `http://localhost:${process.env.PORT || 3000}`;
+      `${req.protocol}://${req.get('host')}`;
 
     const qrFilePath = `uploads/qr-${file.id}.png`;
 
     await QRCode.toFile(qrFilePath, `${baseUrl}/file/${file.id}`);
 
+    // Send email if recipient email is provided
+    console.log("=== Upload Route Debug ===");
+    console.log("Request body:", req.body);
+    console.log("Has email field:", !!req.body.email);
+    console.log("Email value:", req.body.email);
+    
+    if (req.body.email) {
+      console.log("Calling sendShareEmail function...");
+      await sendShareEmail(
+        req.body.email,
+        req.file.originalname,
+        `${baseUrl}/file/${file.id}`,
+        accessCode
+      );
+    } else {
+      console.log("No recipient email provided - skipping email sending");
+    }
+
     res.render("index", {
       fileLink: `${baseUrl}/file/${file.id}`,
       qrCodePath: `/uploads/qr-${file.id}.png`,
       accessCode,
+      emailSent: !!req.body.email && !!process.env.SENDGRID_API_KEY,
     });
   } catch (err) {
     console.error(err);
